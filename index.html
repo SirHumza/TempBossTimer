@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boss Spawn Timer</title>
+    <style>
+        :root {
+            --primary: #ff4757;
+            --shadow: 0px 4px 10px rgba(255, 71, 87, 0.3);
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            text-align: center;
+            padding: 50px;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            color: white;
+        }
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+        #timer {
+            font-size: 3rem;
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            display: inline-block;
+            transition: color 0.5s ease-in-out;
+        }
+        #boss {
+            font-size: 4rem;
+            color: var(--primary);
+            display: none;
+            font-weight: bold;
+            text-shadow: 0 0 20px var(--primary);
+            animation: pulse 1s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        .github-corner {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--primary);
+            color: white;
+            padding: 10px 18px;
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            box-shadow: var(--shadow);
+            z-index: 1000;
+            transition: transform 0.2s ease;
+        }
+        .github-corner:hover {
+            transform: translateY(-2px);
+        }
+        @media (max-width: 768px) {
+            .github-corner {
+                padding: 8px 12px;
+            }
+            .github-text {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Next 15-Minute Boss Spawn</h1>
+    <div id="boss">BOSS SPAWNED!</div>
+    <div id="timer">Calculating...</div>
+    
+    <a href="https://github.com/SirHumza/AppInventor-Fusion/" 
+       target="_blank" 
+       class="github-corner">
+        <i class="fab fa-github"></i>
+        <span class="github-text">Made by SirHumza</span>
+    </a>
+    
+    <script>
+        let bossActive = false;
+        
+        function getNextDropTime() {
+            let now = new Date();
+            let lastDrop = new Date();
+            lastDrop.setHours(19, 47, 0, 0);
+            
+            while (lastDrop <= now) {
+                lastDrop.setMinutes(lastDrop.getMinutes() + 15);
+            }
+            
+            return lastDrop;
+        }
+        
+        function updateTimer() {
+            let now = new Date();
+            let nextDrop = getNextDropTime();
+            let diff = Math.max(0, nextDrop - now);
+            let minutes = Math.floor(diff / 60000);
+            let seconds = Math.floor((diff % 60000) / 1000);
+            let timerElement = document.getElementById("timer");
+            let bossElement = document.getElementById("boss");
+            
+            if (diff === 0 && !bossActive) {
+                bossActive = true;
+                bossElement.style.display = "block";
+                timerElement.style.display = "none";
+                setTimeout(() => {
+                    bossElement.style.display = "none";
+                    timerElement.style.display = "block";
+                    resetTimer();
+                }, 120000); // 2 minutes of "BOSS SPAWNED"
+            } else {
+                timerElement.textContent = `${minutes}m ${seconds}s`;
+                setTimeout(updateTimer, 1000);
+            }
+        }
+        
+        function resetTimer() {
+            let now = new Date();
+            let nextDrop = new Date();
+            nextDrop.setMinutes(now.getMinutes() + 15);
+            nextDrop.setSeconds(0);
+            
+            setTimeout(() => {
+                bossActive = false;
+                updateTimer();
+            }, 1000);
+        }
+        
+        updateTimer();
+    </script>
+</body>
+</html>
